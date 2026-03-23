@@ -1,4 +1,5 @@
-import * as cheerio from 'cheerio'
+import { Readability } from '@mozilla/readability'
+import { JSDOM } from 'jsdom'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,8 +16,8 @@ export default async function handler(req, res) {
     // Step 1 — Fetch the article page
     const pageResponse = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; DropSum/1.0)'
-      }, 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
       signal: AbortSignal.timeout(10000)
     })
 
@@ -24,28 +25,24 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Could not fetch that URL' })
     }
 
-    // Step 2 — Extract readable text
+    // Step 2 — Parse with Readability
     const html = await pageResponse.text()
-    const $ = cheerio.load(html)
+    const dom = new JSDOM(html, { url })
+    const reader = new Readability(dom.window.document)
+    const article = reader.parse()
 
-    // Remove clutter
-    $('script, style, nav, footer, header, aside, iframe').remove()
-
-    // Get main content
-
-const articleText = $('article, main, [role="main"], .article, .content, .post, .project-content, .prose').text()
-  || $('body').text()
-
-const cleanText = articleText
-  .replace(/\s+/g, ' ')
-  .trim()
-  .slice(0, 8000)
-
-    if (!cleanText) {
-      return res.status(400).json({ error: 'Could not extract text from that page' })
+    if (!article || !article.textContent) {
+      return res.status(400).json({ error: 'Could not extract article content' })
     }
 
-    // Step 3 — Send text to Groq
+    // Step 3 — Clean and trim the text
+    const cleanText = article.textContent
+    const content = `Title: ${article.title}\n\n${cleanText}`
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 8000)
+
+    // Step 4 — Send to Groq
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -58,7 +55,7 @@ const cleanText = articleText
         messages: [
           {
             role: 'user',
-            content: `Please summarize the following article in 3-5 clear sentences. Return only the summary with no introduction, no prefix, and no labels.\n\n${cleanText}`
+            content: `Summarize the following article in 3-5 clear sentences. Return only the summary with no introduction, no prefix, and no labels.\n\n${content}`
           }
         ]
       })
@@ -75,7 +72,6 @@ const cleanText = articleText
 
   } catch (error) {
     console.error('Error:', error)
-    res.status(500).json({ error: 'Something went wrong' })
+    res.status(500).json({ error: 'Could not summarize that page. Try a different URL.' })
   }
 }
-
