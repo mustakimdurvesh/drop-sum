@@ -1,5 +1,5 @@
 import { Readability } from '@mozilla/readability'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -27,8 +27,8 @@ export default async function handler(req, res) {
 
     // Step 2 — Parse with Readability
     const html = await pageResponse.text()
-    const dom = new JSDOM(html, { url })
-    const reader = new Readability(dom.window.document)
+   const { document } = parseHTML(html)
+   const reader = new Readability(document)
     const article = reader.parse()
 
     if (!article || !article.textContent) {
