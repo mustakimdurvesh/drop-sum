@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drop Sum</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <meta name="description" content="Paste any article link and get a clear, concise summary powered by AI.">
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drop Sum</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Paste any article link and get a clear, concise summary powered by AI.">
+</head>
 
-  <body>
+<body>
   <div class="card">
     <h1>DropSum</h1>
     <p class="subtitle">Drop a link. Get the point.</p>
-    <input type="url" id="urlInput" 
-           placeholder="Drop your link here and get a summary"
-           autocomplete="url"
-           autocorrect="off"
-           autocapitalize="off">
+    <!-- Auth section -->
+    <div class="topbar">
+      <div id="userInfo" class="hidden">
+        <span id="userEmail"></span>
+        <button id="signOutBtn" class="small secondary">Sign out</button>
+      </div>
+      <button id="signInTrigger">Sign in</button>
+    </div>
+
+    <div id="authForms" class="hidden">
+      <input type="email" id="emailInput" placeholder="Email">
+      <input type="password" id="passwordInput" placeholder="Password">
+      <div class="auth-buttons">
+        <button id="signInBtn">Sign in</button>
+        <button id="signUpBtn" class="secondary">Sign up</button>
+      </div>
+      <p id="authError" class="auth-error hidden"></p>
+    </div>
+    <input type="url" id="urlInput" placeholder="Drop your link here and get a summary" autocomplete="url"
+      autocorrect="off" autocapitalize="off">
     <button id="summarizeBtn">Summarize</button>
     <div id="loading" class="hidden">
-        <div class="spinner"></div>
-        <p class="loading-text">Summarizing...</p>
-      </div>
+      <div class="spinner"></div>
+      <p class="loading-text">Summarizing...</p>
+    </div>
     <div id="result" class="hidden">
-    <div class="result-header">
-    <span class="result-label">Summary</span>
-    <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+      <div class="result-header">
+        <span class="result-label">Summary</span>
+        <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+      </div>
+      <p id="resultText"></p>
+      <span id="wordCount" class="word-count"></span>
+    </div>
+    <div id="history" class="hidden">
+      <p class="history-label">Recent</p>
+      <ul id="historyList"></ul>
+    </div>
   </div>
-  <p id="resultText"></p>
-<span id="wordCount" class="word-count"></span>
-</div>
-<div id="history" class="hidden">
-  <p class="history-label">Recent</p>
-  <ul id="historyList"></ul>
-</div>
-  </div>
-   <script src="script.js"></script>
-  </body>
+  <script type="module" src="script.js"></script>
+</body>
 
 </html>
