@@ -27,14 +27,14 @@ supabase.auth.onAuthStateChange((event, session) => {
     userInfo.classList.remove('hidden')
     signInTrigger.classList.add('hidden')
     userEmail.textContent = currentUser.email.split('@')[0]
-    document.getElementById('saveHint').classList.add('hidden')
+   // document.getElementById('saveHint').classList.add('hidden')
     loadHistory()
   } else {
     authForms.classList.add('hidden')
     userInfo.classList.add('hidden')
     signInTrigger.classList.remove('hidden')
     signInTrigger.textContent = 'Sign in'
-    document.getElementById('saveHint').classList.remove('hidden')
+    //document.getElementById('saveHint').classList.remove('hidden')
     document.getElementById('history').classList.add('hidden')
     document.getElementById('historyList').innerHTML = ''
   }
@@ -105,12 +105,13 @@ async function loadHistory() {
 // ---- Save to Supabase ----
 async function saveToSupabase(url, summary, title) {
   if (!currentUser) return
-  await supabase.from('summaries').insert({
+  const { error } = await supabase.from('summaries').insert({
     user_id: currentUser.id,
     url,
     summary,
     title
   })
+  if (error) console.error('Save error:', error)
 }
 
 // ---- Create history item element ----
@@ -201,5 +202,17 @@ button.addEventListener('click', async function () {
 
   } catch (error) {
     showError('Could not summarize that page. Try a different URL.')
+  }
+})
+
+//Get active session
+supabase.auth.getSession().then(({ data: { session } }) => {
+  if (session?.user) {
+    currentUser = session.user
+    userInfo.classList.remove('hidden')
+    signInTrigger.classList.add('hidden')
+    userEmail.textContent = session.user.email.split('@')[0]
+    document.getElementById('saveHint').classList.add('hidden')
+    loadHistory()
   }
 })
