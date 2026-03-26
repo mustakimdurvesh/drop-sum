@@ -212,7 +212,7 @@ supabase.auth.getSession().then(({ data: { session } }) => {
     userInfo.classList.remove('hidden')
     signInTrigger.classList.add('hidden')
     userEmail.textContent = session.user.email.split('@')[0]
-    document.getElementById('saveHint').classList.add('hidden')
+    //document.getElementById('saveHint').classList.add('hidden')
     loadHistory()
   }
 })
