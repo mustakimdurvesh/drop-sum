@@ -2,7 +2,7 @@
 
 **Drop a link. Get the point.**
 
-DropSum is an AI-powered article summarizer. Paste any article URL and get a concise 3–5 sentence summary in seconds — no reading required.
+DropSum is an AI-powered article summarizer. Paste any article URL and get a concise 3–5 sentence summary in seconds — no reading required. Just go to https://drop-sum.vercel.app/.
 
 ---
 
